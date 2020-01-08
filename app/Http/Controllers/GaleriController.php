@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Galeri;
 use App\KategoriGaleri;
-use DB;
-use Mockery\Exception;
 
 class GaleriController extends Controller
 {
@@ -33,23 +31,19 @@ class GaleriController extends Controller
     }
 
     public function store(Request $request){
-
-        DB::transaction(function () use ($request) {
-            $input= $request->except('path');
+        $input= $request->except('path');
      
-            $Galeri=Galeri::create($input);
-    
-            if ($request->has('path')){
-                $file=$request->file('path');
-                $filename=$Galeri->id.'.'.$file->getClientOriginalExtension();
-                $path=$request->path->storeAs('public/galeri',$filename,'local');
-                $Galeri->path="storage".substr($path,strpos($path,'/'));
-                $Galeri->save();
-            }
-        }, 3);
+        $Galeri=Galeri::create($input);
 
+        if ($request->has('path')){
+            $file=$request->file('path');
+            $filename=$Galeri->id.'.'.$file->getClientOriginalExtension();
+            $path=$request->path->storeAs('public/galeri',$filename,'local');
+            $Galeri->path="storage".substr($path,strpos($path,'/'));
+            $Galeri->save();
+        }
 
-        return redirect(route('galeri.index'));
+     return redirect(route('galeri.index'));
     }
 
     public function edit($id){
